@@ -62,11 +62,46 @@ def load_candidates(path):
     if str(path).endswith(".gz"):
         import gzip
         opener = gzip.open
-    with opener(path, "rt", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                yield json.loads(line)
+    # Try a set of common encodings, then fall back to a safe binary-read
+    encodings = ("utf-8", "utf-8-sig", "cp1252", "latin-1")
+    for enc in encodings:
+        try:
+            with opener(path, "rt", encoding=enc, errors="strict") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        yield json.loads(line)
+                    except json.JSONDecodeError:
+                        # skip malformed/non-JSON lines
+                        continue
+            return
+        except UnicodeDecodeError:
+            # try the next encoding
+            continue
+        except FileNotFoundError:
+            # propagate missing file errors immediately
+            raise
+
+    # Final fallback: read raw bytes and decode lines with replacement
+    mode = "rb"
+    with opener(path, mode) as f:
+        for raw in f:
+            try:
+                if isinstance(raw, bytes):
+                    line = raw.decode("utf-8", errors="replace").strip()
+                else:
+                    # in case opener returned text lines unexpectedly
+                    line = str(raw).strip()
+                if line:
+                    try:
+                        yield json.loads(line)
+                    except json.JSONDecodeError:
+                        # skip malformed lines
+                        continue
+            except Exception:
+                continue
 
 
 def build_reasoning(row):
@@ -134,6 +169,10 @@ def main():
         n += 1
         if n % 20000 == 0:
             print(f"  ...{n} candidates processed ({time.time()-t0:.1f}s)", file=sys.stderr)
+    if n == 0:
+        print(f"Error: no valid JSON candidates found in {args.candidates}.\n"
+              "The file may be binary or not formatted as JSONL.", file=sys.stderr)
+        sys.exit(1)
 
     df = pd.DataFrame(records)
     print(f"  loaded {len(df)} candidates in {time.time()-t0:.1f}s", file=sys.stderr)

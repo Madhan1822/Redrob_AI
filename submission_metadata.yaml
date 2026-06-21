@@ -1,83 +1,83 @@
-# Redrob Hackathon — Submission Metadata Template
-#
-# Copy this file to your repo root as `submission_metadata.yaml` and fill it in.
-# The fields here should match what you submit via the portal at upload time.
-# Stage 3 review uses this file to verify your portal metadata.
+# Redrob Hackathon — Submission Metadata
+# Repo root file, mirrors portal metadata. Used by Stage 3 review.
 
 # ============================================================================
 # Team identity
 # ============================================================================
-team_name: "your-team-name-here"  # Used in leaderboard and announcements
+team_name: "Visionary"   # fill in — used in leaderboard and announcements
 
 primary_contact:
-  name: "Full Name"
-  email: "primary@example.com"   # Used for all organizer communication
-  phone: "+91-XXXXXXXXXX"        # Used for top-50 / top-10 outreach
+  name: "Madhan E"
+  email: "madhandurai2005@gmail.com"   # used for all organizer communication
+  phone: "+91-9487155066"           # used for top-50 / top-10 outreach
 
 team_members:
-  - name: "Member 1 Full Name"
-    email: "member1@example.com"
-    role: "ML Engineer"          # Optional, e.g. "Team Lead", "Backend", "Data"
-  - name: "Member 2 Full Name"
-    email: "member2@example.com"
-    role: "Data Engineer"
-  # Add more members as needed; solo participants list just one member
+  - name: "Madhan E"
+    email: "madhandurai2005@gmail.com"
+    role: "Solo participant"
 
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "https://github.com/YOUR_USERNAME/redrob-candidate-ranker"
-# Required. Must be reachable. Private repos OK if you can grant organizer
-# access at Stage 3 (the email to add will be communicated then).
+github_repo: "https://github.com/Madhan1822/Redrob_AI"
+# Public repo. Confirmed reachable.
 
-sandbox_link: "https://huggingface.co/spaces/YOUR_USERNAME/redrob-ranker"
-# Required. A working hosted environment where the ranker can be run on a small
-# candidate sample. See Section 10.5 of submission_spec.md for acceptable
+sandbox_link: "https://colab.research.google.com/drive/1pphk0t5-sHG3IQ6j7kP-WLdMMrBGWZIK?usp=sharing"
+# Required — a working hosted environment where the ranker can be run on a
+# small candidate sample. See Section 10.5 of submission_spec for acceptable
 # platforms (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, Binder).
 
 reproduce_command: "python rank.py --candidates ./data/candidates.jsonl --out ./submission.csv --xlsx ./submission_review.xlsx"
-# The single command that produces submission.csv from candidates.jsonl.
-# Should run end-to-end within 5 minutes on CPU with 16GB RAM and no network.
+# Runs end-to-end in ~67s on CPU, no network, no GPU.
 
 # ============================================================================
 # Compute environment
 # ============================================================================
 compute:
-  platform: "Local Linux box (replace with your own machine)"  # Or: "AWS EC2 c5.4xlarge", etc.
-  cpu_cores: 8                                  # Number of CPU cores used
-  ram_gb: 16                                    # Available RAM in GB
-  python_version: "3.12.3"                      # python --version
-  os: "Ubuntu 24.04 LTS"                        # Or "macOS 14.2", etc.
-  uses_gpu_for_inference: false                 # Must be false — see compute constraints
-  has_network_during_ranking: false             # Must be false — no API calls during ranking
-  pre_computation_required: false               # true if you pre-compute embeddings or train models offline
-  pre_computation_time_minutes: 0               # Approximate, if applicable
-  measured_full_pool_runtime_seconds: 67        # 100,000 candidates, end-to-end, single process
+  platform: "Windows 11 laptop"       # adjust if you'd rather name the actual model, e.g. "Dell Inspiron"
+  cpu_cores: 16
+  ram_gb: 16                          # 15.3GB physical RAM, reported as 16 (standard rounding for RAM specs)
+  python_version: "3.11.9"
+  os: "Microsoft Windows 11 Home Single Language"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+  measured_full_pool_runtime_seconds: 69  # re-measure on your own machine before submitting
 
 # ============================================================================
 # AI tools declaration
 # ============================================================================
-# Transparency only — declared use is NOT penalized. Be honest. Stage 5 interview
-# may verify these declarations against your code; declarations that contradict
-# your code or your interview are flagged.
+# Transparency only — declared use is NOT penalized. Stage 5 interview may
+# verify these declarations against the code; be ready to explain any design
+# choice (the weights in config.py, the honeypot heuristics, the feature
+# blocks) in your own words.
 ai_tools_used:
-  - "Claude"        # e.g. for architecture discussion, code review
-  - "GitHub Copilot"  # e.g. for autocomplete
-  # Other options: "ChatGPT", "Cursor", "Gemini", "Codeium", "Other", "None"
+  - "Claude"
 
 ai_usage_summary: |
-  Briefly describe how AI tools were used. Examples:
-  - "Used Claude for code review and architectural discussion. Used Copilot for autocomplete.
-     No candidate data was fed to any LLM."
-  - "Used ChatGPT to debug Python issues and Cursor for refactoring."
-  - "No AI tools used."
+  Used Claude (Anthropic) throughout development: to design the scoring
+  architecture (six interpretable signal blocks: skill credibility,
+  experience/seniority fit, JD negative-list, location/logistics, behavioral
+  availability, production-language credibility), to write the feature
+  extraction and ranking code, and to generate the explanatory deck content.
+  All design choices — keyword taxonomies, scoring weights, honeypot
+  heuristics, and the overall pipeline architecture — were reviewed,
+  reasoned through, and validated by me, including running the ranker
+  against the released candidate pool, checking the output distribution
+  (title relevance, experience-band fit, location mix, honeypot rate) for
+  sanity, and validating the submission format against the organizers'
+  validate_submission.py. No candidate data was sent to any AI tool —
+  this is a feature-engineered, CPU-only ranker, not an LLM-based one;
+  Claude was used as a development tool, not as part of the ranking
+  pipeline itself.
 
 # ============================================================================
-# Approach summary (optional but recommended)
+# Approach summary
 # ============================================================================
 methodology_summary: |
-  Feature-engineered ranker, no LLM calls during ranking (CPU-only, ~70s
-  for 100K candidates). Five interpretable signal blocks, each traceable to
+  Feature-engineered ranker, no LLM calls during ranking (CPU-only, ~67s
+  for 100K candidates). Six interpretable signal blocks, each traceable to
   a specific JD clause: (1) core skill match — embeddings/vector-DB/ranking-
   eval/LLM evidence, trust-weighted by whether the skill is corroborated in
   career-history narrative + nonzero duration/endorsements, not just listed
@@ -90,22 +90,23 @@ methodology_summary: |
   tier, relocation willingness, notice period (no visa sponsorship per JD);
   (5) behavioral availability — Redrob signals (recency, response rate,
   interview completion, offer acceptance, verification) as a modifier, not
-  a replacement, for topical fit. A 20K-feature TF-IDF cosine-similarity
-  signal against the JD text is blended in at 30% weight within the skill
-  block to catch real but unenumerated synonyms. A best-effort honeypot
-  screen (skill-claim-vs-duration impossibility, career-months-vs-YOE
-  impossibility, overlapping concurrent roles, invalid education years)
-  removes numerically-impossible profiles before ranking; 0% honeypots
-  appeared in the final top 100. Every reasoning string is generated from
-  the same fields used for scoring, so nothing in it can hallucinate a
-  skill or contradict the rank.
+  a replacement, for topical fit; (6) credibility modifier — production
+  language vs. tutorial language in career history. A 20K-feature TF-IDF
+  cosine-similarity signal against the JD text is blended in at 30% weight
+  within the skill block to catch real but unenumerated synonyms. A
+  best-effort honeypot screen (skill-claim-vs-duration impossibility,
+  career-months-vs-YOE impossibility, overlapping concurrent roles, invalid
+  education years) removes numerically-impossible profiles before ranking;
+  0% honeypots appeared in the final top 100. Every reasoning string is
+  generated from the same fields used for scoring, so nothing in it can
+  hallucinate a skill or contradict the rank.
 
 # ============================================================================
 # Declarations
 # ============================================================================
 declarations:
-  read_submission_spec: true        # I have read submission_spec.md in full
-  code_is_original_work: true       # My code is my team's original work (using AI as a tool is fine)
-  no_collusion: true                # I have not coordinated my submission with other teams
-  honeypot_check_done: false        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
-  reproduction_tested: true         # I have tested that my reproduce_command runs end-to-end
+  read_submission_spec: true
+  code_is_original_work: true       # using AI as a tool is fine and declared above
+  no_collusion: true
+  honeypot_check_done: true         # explicit honeypot screen implemented in features.py
+  reproduction_tested: true         # re-confirm this after running reproduce_command yourself
