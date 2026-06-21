@@ -1,0 +1,111 @@
+# Redrob Hackathon — Submission Metadata Template
+#
+# Copy this file to your repo root as `submission_metadata.yaml` and fill it in.
+# The fields here should match what you submit via the portal at upload time.
+# Stage 3 review uses this file to verify your portal metadata.
+
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "your-team-name-here"  # Used in leaderboard and announcements
+
+primary_contact:
+  name: "Full Name"
+  email: "primary@example.com"   # Used for all organizer communication
+  phone: "+91-XXXXXXXXXX"        # Used for top-50 / top-10 outreach
+
+team_members:
+  - name: "Member 1 Full Name"
+    email: "member1@example.com"
+    role: "ML Engineer"          # Optional, e.g. "Team Lead", "Backend", "Data"
+  - name: "Member 2 Full Name"
+    email: "member2@example.com"
+    role: "Data Engineer"
+  # Add more members as needed; solo participants list just one member
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/YOUR_USERNAME/redrob-candidate-ranker"
+# Required. Must be reachable. Private repos OK if you can grant organizer
+# access at Stage 3 (the email to add will be communicated then).
+
+sandbox_link: "https://huggingface.co/spaces/YOUR_USERNAME/redrob-ranker"
+# Required. A working hosted environment where the ranker can be run on a small
+# candidate sample. See Section 10.5 of submission_spec.md for acceptable
+# platforms (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, Binder).
+
+reproduce_command: "python rank.py --candidates ./data/candidates.jsonl --out ./submission.csv --xlsx ./submission_review.xlsx"
+# The single command that produces submission.csv from candidates.jsonl.
+# Should run end-to-end within 5 minutes on CPU with 16GB RAM and no network.
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Local Linux box (replace with your own machine)"  # Or: "AWS EC2 c5.4xlarge", etc.
+  cpu_cores: 8                                  # Number of CPU cores used
+  ram_gb: 16                                    # Available RAM in GB
+  python_version: "3.12.3"                      # python --version
+  os: "Ubuntu 24.04 LTS"                        # Or "macOS 14.2", etc.
+  uses_gpu_for_inference: false                 # Must be false — see compute constraints
+  has_network_during_ranking: false             # Must be false — no API calls during ranking
+  pre_computation_required: false               # true if you pre-compute embeddings or train models offline
+  pre_computation_time_minutes: 0               # Approximate, if applicable
+  measured_full_pool_runtime_seconds: 67        # 100,000 candidates, end-to-end, single process
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+# Transparency only — declared use is NOT penalized. Be honest. Stage 5 interview
+# may verify these declarations against your code; declarations that contradict
+# your code or your interview are flagged.
+ai_tools_used:
+  - "Claude"        # e.g. for architecture discussion, code review
+  - "GitHub Copilot"  # e.g. for autocomplete
+  # Other options: "ChatGPT", "Cursor", "Gemini", "Codeium", "Other", "None"
+
+ai_usage_summary: |
+  Briefly describe how AI tools were used. Examples:
+  - "Used Claude for code review and architectural discussion. Used Copilot for autocomplete.
+     No candidate data was fed to any LLM."
+  - "Used ChatGPT to debug Python issues and Cursor for refactoring."
+  - "No AI tools used."
+
+# ============================================================================
+# Approach summary (optional but recommended)
+# ============================================================================
+methodology_summary: |
+  Feature-engineered ranker, no LLM calls during ranking (CPU-only, ~70s
+  for 100K candidates). Five interpretable signal blocks, each traceable to
+  a specific JD clause: (1) core skill match — embeddings/vector-DB/ranking-
+  eval/LLM evidence, trust-weighted by whether the skill is corroborated in
+  career-history narrative + nonzero duration/endorsements, not just listed
+  as a tag (this is the direct counter to the keyword-stuffing trap); (2)
+  experience & seniority fit — soft Gaussian around the 5-9y band plus
+  title-chaser and research-only/architecture-only detectors drawn from the
+  JD's explicit disqualifiers; (3) domain negative-list — consulting-only,
+  CV/speech/robotics-only, recent-LangChain-wrapper-only penalties, each
+  with the JD's own escape clauses encoded; (4) location & logistics — city
+  tier, relocation willingness, notice period (no visa sponsorship per JD);
+  (5) behavioral availability — Redrob signals (recency, response rate,
+  interview completion, offer acceptance, verification) as a modifier, not
+  a replacement, for topical fit. A 20K-feature TF-IDF cosine-similarity
+  signal against the JD text is blended in at 30% weight within the skill
+  block to catch real but unenumerated synonyms. A best-effort honeypot
+  screen (skill-claim-vs-duration impossibility, career-months-vs-YOE
+  impossibility, overlapping concurrent roles, invalid education years)
+  removes numerically-impossible profiles before ranking; 0% honeypots
+  appeared in the final top 100. Every reasoning string is generated from
+  the same fields used for scoring, so nothing in it can hallucinate a
+  skill or contradict the rank.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true        # I have read submission_spec.md in full
+  code_is_original_work: true       # My code is my team's original work (using AI as a tool is fine)
+  no_collusion: true                # I have not coordinated my submission with other teams
+  honeypot_check_done: false        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
+  reproduction_tested: true         # I have tested that my reproduce_command runs end-to-end
